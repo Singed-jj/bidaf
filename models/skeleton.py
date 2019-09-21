@@ -29,9 +29,9 @@ class Skeleton:
         """
         pass
 
-    def attraction_flow_layer(self):
+    def attention_flow_layer(self):
         """
-        attraction flow layer
+        attention flow layer
 
         1. context to query attention
         2. query to context attetion
