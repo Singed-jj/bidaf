@@ -1,0 +1,18 @@
+
+{
+  "base_dir":"/Users/jaejin/experiences/paper_coding/bidaf/",
+  "comet_api_key":"VhFWWgtTWcqrlIGNP7EYCuErH",
+  "batch_size": 60,
+  "num_epochs": 12,
+  "learning_rate" : 0.5,
+  "data_dir": "/Users/jaejin/experiences/paper_coding/bidaf/data/squad/",
+  "summary_dir": "/Users/jaejin/experiences/paper_coding/bidaf/data/summary/",
+  "log_period": 100,
+  "dev_period":100,
+  "word_emb_size":300,
+  "max_sent_num": 60,
+  "max_word_num": 64,
+  "max_ques_size": 30,
+  "character_dim": 100,
+  "max_word_size": 16
+}

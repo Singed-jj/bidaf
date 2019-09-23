@@ -2,6 +2,7 @@ import os
 import json
 import nltk
 from tqdm import tqdm
+import numpy as np
 
 args = {
     'glove_corpus' : '840B',
@@ -19,7 +20,7 @@ def get_w2v_dict(word_set):
     glove_path = os.path.join(args['glove_dir'], "glove.{}.{}d.txt".format(args['glove_corpus'], args['glove_vec_dim']))
     num_word = 2200000
     w2v = dict()
-
+    w2i = dict()
     # num_word = 100
     with open(glove_path, 'r') as o:
         for line in tqdm(o, total=num_word):
@@ -28,8 +29,11 @@ def get_w2v_dict(word_set):
             if w.lower() in word_set:
                 vec = list(map(float, array[1:]))
                 w2v[w.lower()] = vec
+                w2i[w.lower()] = len(w2i)
 
-    return w2v
+    return w2v,w2i
+
+
 
 def get_index_of_start_stop(context,x_w,start,stop):
     si_start, wi_start = get_si_and_wi(context,x_w,start)
@@ -46,6 +50,7 @@ def get_si_and_wi(context, x_w, ci):
 
 def pre_prop_all():
 
+    pre_process_src('train', out_name='total')
     pre_process_src('train', to_ratio=args['train_ratio'], out_name='train')
     pre_process_src('train', from_ratio=args['train_ratio'], out_name='dev')
     pre_process_src('dev', out_name='test')
@@ -74,6 +79,13 @@ def pre_process_src(src_name,from_ratio=0.0,to_ratio=1.0,out_name=None):
     word_set = set()
     # char_set = set()
     # text_data = []
+    w2i_dict={}
+    c2i_dict={}
+
+
+
+
+
     for a_i, article in enumerate(tqdm(src_data['data'][from_a:to_a])):
 
         x_pw = []
@@ -100,7 +112,8 @@ def pre_process_src(src_name,from_ratio=0.0,to_ratio=1.0,out_name=None):
             for sent in x_cw:
                 for w in sent:
                     word_set.add(w.lower())
-                    # for c in w:
+
+
                     #     char_set.add(c)
 
 
@@ -111,6 +124,9 @@ def pre_process_src(src_name,from_ratio=0.0,to_ratio=1.0,out_name=None):
 
                 q_w = word_tokenize(qna['question'])
                 q_c = [list(w) for w in q_w]
+
+                for w in q_w:
+                    word_set.add(w.lower())
 
                 ys = []
                 anss = []
@@ -129,8 +145,13 @@ def pre_process_src(src_name,from_ratio=0.0,to_ratio=1.0,out_name=None):
                 y.append(ys)
                 y_ans.append(anss)
 
-    w2v_dict = get_w2v_dict(word_set)
+    w2v_dict,w2i_dict = get_w2v_dict(word_set)
 
+    # i2v_dict = {w2i_dict[word]: vec for i, (word, vec) in enumerate(w2v_dict.items()) if word in w2i_dict}
+
+    c_list = list('abcdefghijklmnopqrstuvwxyz0123456789-,;.!?:’’’/\|_@#$%ˆ&*˜‘+-=<>()[]{}')
+    for i,alphabet in enumerate(c_list):
+        c2i_dict[alphabet] = i
     data = {
         'qs_w' : qs_w, # questions words' list # example : [['what','was','the','title','?'], .. , []]
         'qs_c' : qs_c, # questions chars' list # example : [[['w','h','a','t'],['w','a','s'],['t','h','e'],['t','i','t','l','e'],['?']], .. ,[]]
@@ -140,7 +161,9 @@ def pre_process_src(src_name,from_ratio=0.0,to_ratio=1.0,out_name=None):
     }
 
     fixed_data = {
-        'w2v_dict': w2v_dict,
+        'w2v_dict': w2v_dict, # {'the' : [,,,,...,,], ',' : [,,,,...,,], ...}
+        'w2i_dict': w2i_dict,
+        'c2i_dict': c2i_dict,
         'x_aw': x_aw,
         'x_ac': x_ac
     }
@@ -151,5 +174,10 @@ def pre_process_src(src_name,from_ratio=0.0,to_ratio=1.0,out_name=None):
     json.dump(fixed_data, open(fixed_data_path, 'w'))
 
 
+
 if __name__ == "__main__":
+    # pre_process_sec("dev")
+    # pre_process_sec("train")
+    # pre_process_sec("test")
+
     pre_prop_all()
