@@ -2,11 +2,6 @@
 - 1. python.__version__ : 3.7.1
 - 2. tensorflow.__version__ : 1.14
 
-### 구현정도
-- model : modeling layer 에 "ValueError: Dimensions must be equal, but are 300 and 900 for 'model_cpu0/modeling_layer/bidirectional_rnn/fw/fw/while/lstm_cell/MatMul_1' (op: 'MatMul') with input shapes: [3600,300], [900,400]." 버그 존재.
-- trainer : 구현 완료.
-- f1, EM score : 구현 못함.
-
 ### 구현순서
 - 1. model/pre_processor.py
 - 2. model/bidaf_model.py
